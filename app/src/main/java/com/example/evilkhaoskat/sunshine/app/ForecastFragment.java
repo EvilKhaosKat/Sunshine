@@ -313,9 +313,7 @@ public class ForecastFragment extends Fragment {
             if (result != null) {
                 mForecastAdapter.clear();
 
-                for (String forecast : result) {
-                    mForecastAdapter.add(forecast);
-                }
+                mForecastAdapter.addAll(result);
             }
         }
     }
