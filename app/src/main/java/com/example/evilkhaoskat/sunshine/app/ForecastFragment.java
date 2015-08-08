@@ -14,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -106,6 +109,26 @@ public class ForecastFragment extends Fragment {
                 return null;
             }
 
+            String weatherJsonStr = getWeatherJson(params);
+            if (weatherJsonStr == null) return null;
+
+            try {
+                JSONObject weatherJsonObj = new JSONObject(weatherJsonStr);
+                Log.v(LOG_TAG, "max weather of first day:" +
+                        weatherJsonObj
+                                .getJSONArray("list")
+                                .getJSONObject(0)
+                                .getJSONObject("temp")
+                                .getString("max"));
+            } catch (JSONException e) {
+                Log.d(LOG_TAG, "weather json parsing failed with " + e.getMessage());
+            }
+
+
+            return null;
+        }
+
+        private String getWeatherJson(String[] param) {
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -130,7 +153,7 @@ public class ForecastFragment extends Fragment {
                 final String DAYS_PARAM = "cnt";
 
                 Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                        .appendQueryParameter(QUERY_PARAM, params[0])
+                        .appendQueryParameter(QUERY_PARAM, param[0])
                         .appendQueryParameter(FORMAT_PARAM, format)
                         .appendQueryParameter(UNITS_PARAM, units)
                         .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
@@ -185,7 +208,8 @@ public class ForecastFragment extends Fragment {
                     }
                 }
             }
-            return null;
+
+            return forecastJsonStr;
         }
     }
 }
